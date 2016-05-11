@@ -35,11 +35,13 @@ import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.events.SessionListener;
+import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.repository.Repository;
 import org.apache.maven.wagon.repository.RepositoryPermissions;
 import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.maven.wagon.resource.Resource;
 
 public class PackagecloudWagon extends AbstractWagon {
     private static final java.lang.String TOKEN = "2f747effc2698af583a2784c8c4ba92779d4e2381e63f77c";
@@ -80,18 +82,26 @@ public class PackagecloudWagon extends AbstractWagon {
 
     public void get(String s, File file) throws TransferFailedException, ResourceDoesNotExistException, AuthorizationException {
         StatusLine statusLine;
+
+
+        Resource resource = new Resource( s );
+
         //TODO use a url builder
         HttpGet httpGet = new HttpGet(String.format("/api/v1/repos/saldo/hi/artifacts.json?key=%s", s));
 
         CloseableHttpResponse response = null;
         try {
+            fireGetStarted( resource, file );
             response = httpClient.execute(targetHost, httpGet, context);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+
+
         try {
             statusLine = response.getStatusLine();
+
 
             if (statusLine.getStatusCode() == 404) {
                 throw new ResourceDoesNotExistException(String.format("Not found %s", s));
@@ -100,7 +110,9 @@ public class PackagecloudWagon extends AbstractWagon {
             HttpEntity entity = response.getEntity();
             System.out.println(String.format("Writing to %s", file.getAbsolutePath()));
             FileUtils.copyInputStreamToFile(entity.getContent(), file);
-
+            System.out.println("firing event getcompleted!");
+            postProcessListeners(resource, file, TransferEvent.REQUEST_GET);
+            fireGetCompleted(resource, file);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -120,6 +132,14 @@ public class PackagecloudWagon extends AbstractWagon {
     public void put(File file, String s) throws TransferFailedException, ResourceDoesNotExistException, AuthorizationException {
         String strResponse;
         StatusLine statusLine;
+
+        Resource resource = new Resource(s);
+
+        firePutInitiated( resource, file );
+
+        resource.setContentLength( file.length() );
+
+        resource.setLastModified( file.lastModified() );
 
         //TODO use a url builder
         HttpPut httpPut = new HttpPut(String.format("/api/v1/repos/saldo/hi/artifacts.json?key=%s", s));
@@ -141,6 +161,7 @@ public class PackagecloudWagon extends AbstractWagon {
         } finally {
             try {
                 response.close();
+                firePutCompleted( resource, null );
             } catch (IOException e) {
                 e.printStackTrace();
             }
