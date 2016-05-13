@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.packagecloud.maven.wagon</groupId>
   <artifactId>maven-packagecloud-wagon</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>0.0.1</version>
   <name>Maven Packagecloud Wagon</name>
   <inceptionYear>2010</inceptionYear>
   <description>
