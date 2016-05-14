@@ -53,5 +53,8 @@ Make sure the `id` matches up with your `distributionManagement` id's
   </servers>
 </settings>
 ```
+
+You can encrypt these passwords by following the instructions for [Apache Maven Password Encryption](https://maven.apache.org/guides/mini/guide-encryption.html)
+
 ### `mvn deploy`
 That's it!
