@@ -1,5 +1,7 @@
 # Packagecloud Maven Wagon
 
+### NOTE: this is currently in beta
+
 ## Usage
 
 **Visit [packagecloud.io/api_token](packagecloud.io/api_token) and get your API token before proceeding.**
