@@ -92,7 +92,9 @@ public class PackagecloudWagon extends AbstractWagon {
             throw new TransferFailedException(String.format("Could not construct url %s to %s", s, getTargetHost().getHostName()));
         } finally {
             try {
-                response.close();
+                if(response != null){
+                    response.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -136,7 +138,9 @@ public class PackagecloudWagon extends AbstractWagon {
             throw new TransferFailedException(String.format("Could not construct url %s to %s", s, getTargetHost().getHostName()));
         } finally {
             try {
-                response.close();
+                if(response != null){
+                    response.close();
+                }
                 firePutCompleted(resource, file);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -159,8 +163,13 @@ public class PackagecloudWagon extends AbstractWagon {
         return context;
     }
 
-    private HttpHost getTargetHost(){
-        return new HttpHost(getRepository().getHost(), getRepository().getPort(), "http");
+    private HttpHost getTargetHost() {
+        String protocol = getRepository().getProtocol();
+        if (protocol.contains("https")) {
+            return new HttpHost(getRepository().getHost(), getRepository().getPort(), "https");
+        } else {
+            return new HttpHost(getRepository().getHost(), getRepository().getPort(), "http");
+        }
     }
 
     private PackagecloudInfo getPackagecloudInfo() {

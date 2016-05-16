@@ -2,9 +2,16 @@
   <components>
     <component>
       <role>org.apache.maven.wagon.Wagon</role>
-      <role-hint>packagecloud</role-hint>
+      <role-hint>packagecloud+http</role-hint>
       <implementation>io.packagecloud.maven.wagon.PackagecloudWagon</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
     </component>
+    <component>
+      <role>org.apache.maven.wagon.Wagon</role>
+      <role-hint>packagecloud+https</role-hint>
+      <implementation>io.packagecloud.maven.wagon.PackagecloudWagon</implementation>
+      <instantiation-strategy>per-lookup</instantiation-strategy>
+    </component>
+
   </components>
 </component-set>
