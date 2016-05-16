@@ -1,19 +1,34 @@
 package io.packagecloud.maven.wagon;
 
-public class PackagecloudInfo {
-    private final String name;
-    private final String user;
+import org.apache.maven.wagon.repository.Repository;
 
-    public PackagecloudInfo(String user, String repo) {
-        this.name = repo;
-        this.user = user;
+class PackagecloudInfo {
+
+    private String userName;
+    private String repoName;
+
+    PackagecloudInfo(Repository wagonRepository) {
+        String baseDir = wagonRepository.getBasedir();
+        String[] strings = baseDir.split("/");
+
+        if(strings[1] != null){
+            this.userName = strings[1];
+        } else {
+            throw new IllegalArgumentException(String.format("Cant parse userName from %s", baseDir));
+        }
+
+        if(strings[2] != null){
+            this.repoName = strings[2];
+        } else {
+            throw new IllegalArgumentException(String.format("Cant parse repoName from %s", baseDir));
+        }
     }
 
-    public String getName() {
-        return name;
+    String getRepoName() {
+        return repoName;
     }
 
-    public String getUser() {
-        return user;
+    String getUserName() {
+        return userName;
     }
 }

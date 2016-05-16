@@ -173,17 +173,19 @@ public class PackagecloudWagon extends AbstractWagon {
     }
 
     private PackagecloudInfo getPackagecloudInfo() {
-        String[] strings = getRepository().getBasedir().split("/");
-        String packagecloudUser = strings[1];
-        String packagecloudRepository = strings[2];
-        return new PackagecloudInfo(packagecloudUser, packagecloudRepository);
+        return new PackagecloudInfo(getRepository());
     }
 
     private String constructArtifactRequest(String key) throws URISyntaxException {
         PackagecloudInfo packagecloudInfo = getPackagecloudInfo();
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("key", new File("/", key).toString()));
-        URIBuilder builder = new URIBuilder().setParameters(params).setPath(String.format("/api/v1/repos/%s/%s/artifacts.json", packagecloudInfo.getUser(), getPackagecloudInfo().getName()));
+        URIBuilder builder = new URIBuilder()
+                .setParameters(params)
+                .setPath(String.format("/api/v1/repos/%s/%s/artifacts.json",
+                        packagecloudInfo.getUserName(),
+                        getPackagecloudInfo().getRepoName()
+                ));
         return builder.build().toString();
     }
 }
