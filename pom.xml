@@ -7,7 +7,7 @@
   <packaging>jar</packaging>
 
   <name>${project.groupId}:${project.artifactId}</name>
-  <url>https://github.com/computology/io.packagecloud.client</url>
+  <url>https://github.com/computology/maven-packagecloud-wagon</url>
   <description>A maven wagon for uploading artifacts to packagecloud.io</description>
   <inceptionYear>2016</inceptionYear>
 
