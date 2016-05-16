@@ -42,7 +42,7 @@ public class PackagecloudWagon extends AbstractWagon {
     private CloseableHttpClient getConfiguredHttpClient() {
         return HttpClients
                 .custom()
-                .setUserAgent("io.packagecloud.maven.wagon 1.0.0")
+                .setUserAgent("io.packagecloud.maven.wagon 0.0.1")
                 .build();
     }
 
@@ -172,19 +172,19 @@ public class PackagecloudWagon extends AbstractWagon {
         }
     }
 
-    private PackagecloudInfo getPackagecloudInfo() {
-        return new PackagecloudInfo(getRepository());
+    private PackagecloudRepository getPackagecloudRepo() {
+        return new PackagecloudRepository(getRepository());
     }
 
     private String constructArtifactRequest(String key) throws URISyntaxException {
-        PackagecloudInfo packagecloudInfo = getPackagecloudInfo();
+        PackagecloudRepository packagecloudRepository = getPackagecloudRepo();
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("key", new File("/", key).toString()));
         URIBuilder builder = new URIBuilder()
                 .setParameters(params)
                 .setPath(String.format("/api/v1/repos/%s/%s/artifacts.json",
-                        packagecloudInfo.getUserName(),
-                        getPackagecloudInfo().getRepoName()
+                        packagecloudRepository.getUserName(),
+                        packagecloudRepository.getRepoName()
                 ));
         return builder.build().toString();
     }

@@ -2,12 +2,12 @@ package io.packagecloud.maven.wagon;
 
 import org.apache.maven.wagon.repository.Repository;
 
-class PackagecloudInfo {
+class PackagecloudRepository {
 
     private String userName;
     private String repoName;
 
-    PackagecloudInfo(Repository wagonRepository) {
+    PackagecloudRepository(Repository wagonRepository) {
         String baseDir = wagonRepository.getBasedir();
         String[] strings = baseDir.split("/");
 
