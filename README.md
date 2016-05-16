@@ -28,11 +28,11 @@
   <distributionManagement>
     <repository>
       <id>packagecloud.my_repo_releases</id>
-      <url>packagecloud://packagecloud.dev:3000/testy/my_repo</url>
+      <url>packagecloud+http://packagecloud.dev:3000/testy/my_repo</url>
     </repository>
     <snapshotRepository>
       <id>packagecloud.my_repo_snapshots</id>
-      <url>packagecloud://packagecloud.dev:3000/testy/my_repo</url>
+      <url>packagecloud+http://packagecloud.dev:3000/testy/my_repo</url>
     </snapshotRepository>
   </distributionManagement>
 ```
