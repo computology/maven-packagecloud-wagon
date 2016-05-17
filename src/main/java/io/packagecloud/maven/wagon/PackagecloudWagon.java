@@ -1,6 +1,7 @@
 package io.packagecloud.maven.wagon;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
@@ -42,7 +43,7 @@ public class PackagecloudWagon extends AbstractWagon {
     private CloseableHttpClient getConfiguredHttpClient() {
         return HttpClients
                 .custom()
-                .setUserAgent("io.packagecloud.maven.wagon 0.0.1")
+                .setUserAgent("io.packagecloud.maven.wagon 0.0.2")
                 .build();
     }
 
@@ -131,6 +132,16 @@ public class PackagecloudWagon extends AbstractWagon {
             if (statusLine.getStatusCode() == 401) {
                 throw new AuthorizationException(String.format("Could not authenticate with %s", getAuthenticationInfo().getPassword()));
             }
+
+            String responseText = IOUtils.toString(response.getEntity().getContent());
+            if (statusLine.getStatusCode() == 422) {
+                throw new TransferFailedException(String.format("Upload failed: %s", responseText));
+            }
+
+            if (statusLine.getStatusCode() != 201 || statusLine.getStatusCode() != 200) {
+                throw new TransferFailedException(String.format("Upload was not successful: %s", responseText));
+            }
+
 
         } catch (IOException e) {
             throw new TransferFailedException(String.format("Could not transfer %s to %s", s, getTargetHost().getHostName()));
