@@ -84,8 +84,8 @@ public class PackagecloudWagon extends AbstractWagon {
                 throw new AuthorizationException(String.format("Could not authenticate with %s", getAuthenticationInfo().getPassword()));
             }
 
-            String responseText = IOUtils.toString(response.getEntity().getContent());
             if (statusLine.getStatusCode() == 422) {
+                String responseText = IOUtils.toString(response.getEntity().getContent());
                 throw new TransferFailedException(String.format("Download failed: %s", responseText));
             }
 
@@ -143,8 +143,8 @@ public class PackagecloudWagon extends AbstractWagon {
                 throw new AuthorizationException(String.format("Could not authenticate with %s", getAuthenticationInfo().getPassword()));
             }
 
-            String responseText = IOUtils.toString(response.getEntity().getContent());
             if (statusLine.getStatusCode() == 422) {
+                String responseText = IOUtils.toString(response.getEntity().getContent());
                 throw new TransferFailedException(String.format("Upload failed: %s", responseText));
             }
 
