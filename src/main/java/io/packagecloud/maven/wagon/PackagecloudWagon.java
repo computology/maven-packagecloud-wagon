@@ -152,6 +152,7 @@ public class PackagecloudWagon extends AbstractWagon {
                 throw new TransferFailedException("There was an unexpected server error! (500)");
             }
 
+            postProcessListeners(resource, file, TransferEvent.REQUEST_PUT);
 
         } catch (IOException e) {
             throw new TransferFailedException(String.format("Could not transfer %s to %s", s, getTargetHost().getHostName()));
