@@ -83,6 +83,16 @@ public class PackagecloudWagon extends AbstractWagon {
             if (statusLine.getStatusCode() == 401) {
                 throw new AuthorizationException(String.format("Could not authenticate with %s", getAuthenticationInfo().getPassword()));
             }
+
+            String responseText = IOUtils.toString(response.getEntity().getContent());
+            if (statusLine.getStatusCode() == 422) {
+                throw new TransferFailedException(String.format("Download failed: %s", responseText));
+            }
+
+            if (statusLine.getStatusCode() == 500) {
+                throw new TransferFailedException("There was an unexpected server error! (500)");
+            }
+
             HttpEntity entity = response.getEntity();
             FileUtils.copyInputStreamToFile(entity.getContent(), file);
             postProcessListeners(resource, file, TransferEvent.REQUEST_GET);
@@ -138,8 +148,8 @@ public class PackagecloudWagon extends AbstractWagon {
                 throw new TransferFailedException(String.format("Upload failed: %s", responseText));
             }
 
-            if (statusLine.getStatusCode() != 201 || statusLine.getStatusCode() != 200) {
-                throw new TransferFailedException(String.format("Upload was not successful: %s", responseText));
+            if (statusLine.getStatusCode() == 500) {
+                throw new TransferFailedException("There was an unexpected server error! (500)");
             }
 
 
