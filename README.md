@@ -13,7 +13,7 @@
       <extension>
         <groupId>io.packagecloud.maven.wagon</groupId>
         <artifactId>maven-packagecloud-wagon</artifactId>
-        <version>0.0.1</version>
+        <version>0.0.4</version>
       </extension>
     </extensions>
     ...
