@@ -15,6 +15,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.entity.FileEntity;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
@@ -43,7 +44,7 @@ public class PackagecloudWagon extends AbstractWagon {
     private CloseableHttpClient getConfiguredHttpClient() {
         return HttpClients
                 .custom()
-                .setUserAgent("io.packagecloud.maven.wagon 0.0.4")
+                .setUserAgent("io.packagecloud.maven.wagon 0.0.5")
                 .build();
     }
 
@@ -130,7 +131,7 @@ public class PackagecloudWagon extends AbstractWagon {
 
             HttpPut httpPut = new HttpPut(constructArtifactRequest(s));
             FileEntity fileEntity = new FileEntity(file);
-            httpPut.setEntity(fileEntity);
+            httpPut.setEntity(new BufferedHttpEntity(fileEntity));
 
             response = httpClient.execute(getTargetHost(), httpPut, getContext());
             StatusLine statusLine = response.getStatusLine();
