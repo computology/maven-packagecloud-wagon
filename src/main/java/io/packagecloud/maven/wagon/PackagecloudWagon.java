@@ -44,7 +44,7 @@ public class PackagecloudWagon extends AbstractWagon {
     private CloseableHttpClient getConfiguredHttpClient() {
         return HttpClients
                 .custom()
-                .setUserAgent("io.packagecloud.maven.wagon 0.0.5")
+                .setUserAgent("io.packagecloud.maven.wagon 0.0.6")
                 .build();
     }
 
