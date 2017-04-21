@@ -48,24 +48,75 @@ public class PackagecloudWagon extends AbstractWagon {
                 .build();
     }
 
+    private boolean isDebug = false;
+
 	public PackagecloudWagon() {
         super();
     }
 
+    private void insertKeyValueToBuf(StringBuffer buf, String key, String value){
+        buf.append(String.format("\n  %s: %s \n", key, value));
+    }
+
+    private void insertSystemPropertyToBuf(StringBuffer buf, String key){
+        insertKeyValueToBuf(buf, key, System.getProperty(key));
+    }
+
+    private void outputDebug(String str){
+        if(isDebug()){
+            System.out.println(String.format("[PACKAGECLOUD-DEBUG] %s", str));
+        }
+    }
+
     @Override
     protected void openConnectionInternal() throws ConnectionException, AuthenticationException {
+        outputDebug("openConnectionInternal()");
+        String packagecloudDebug = System.getProperty("packagecloudDebug");
+        if (packagecloudDebug != null && packagecloudDebug.equals("true")) {
+           setDebug(true);
+            StringBuffer buf = new StringBuffer();
+            buf.append("\n\n\n-----DEBUG VARS----\n");
+            insertSystemPropertyToBuf(buf, "java.home");
+            insertSystemPropertyToBuf(buf, "java.vm.name");
+            insertSystemPropertyToBuf(buf, "java.version");
+            insertSystemPropertyToBuf(buf, "java.vm.vendor");
+            insertSystemPropertyToBuf(buf, "java.vm.version");
+            insertSystemPropertyToBuf(buf, "user.home");
+            insertKeyValueToBuf(buf, "repository id", getRepository().getId());
+            insertKeyValueToBuf(buf, "repository url", getRepository().getUrl());
+
+            if (getRepository().getPermissions() != null){
+                String dirMode = getRepository().getPermissions().getDirectoryMode();
+                String fileMode = getRepository().getPermissions().getFileMode();
+                String group = getRepository().getPermissions().getGroup();
+                insertKeyValueToBuf(buf, "dirMode", dirMode);
+                insertKeyValueToBuf(buf, "fileMode", fileMode);
+                insertKeyValueToBuf(buf, "group", group);
+            }
+
+            if (getProxyInfo() != null){
+                insertKeyValueToBuf(buf, "proxy.host", getProxyInfo().getHost());
+            }
+
+            buf.append("\n-----END DEBUG VARS----\n");
+            System.out.println(buf.toString());
+        }
+
     }
 
 
     @Override
     public void disconnect() throws ConnectionException {
+        outputDebug("disconnect()");
     }
 
     @Override
     protected void closeConnection() throws ConnectionException {
+        outputDebug("closeConnection()");
     }
 
     public void get(String s, File file) throws TransferFailedException, ResourceDoesNotExistException, AuthorizationException {
+        outputDebug(String.format("get(): %s", s));
         Resource resource = new Resource(s);
         fireGetInitiated(resource, file);
         CloseableHttpResponse response = null;
@@ -120,6 +171,7 @@ public class PackagecloudWagon extends AbstractWagon {
     }
 
     public void put(File file, String s) throws TransferFailedException, ResourceDoesNotExistException, AuthorizationException {
+        outputDebug(String.format("put: %s", s));
         Resource resource = new Resource(s);
         resource.setContentLength(file.length());
         resource.setLastModified(file.lastModified());
@@ -179,6 +231,7 @@ public class PackagecloudWagon extends AbstractWagon {
         authCache.put(getTargetHost(), basicAuth);
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
         String password = getAuthenticationInfo().getPassword();
+        outputDebug("getContext(): looking up password");
         if (password == null){
             // can't find what what we need in settings.xml
             raiseAndtroubleShootPassword();
@@ -217,6 +270,7 @@ public class PackagecloudWagon extends AbstractWagon {
     }
 
     private String constructArtifactRequest(String key) throws URISyntaxException {
+        outputDebug(String.format("constructArtifactRequest(): %s", key));
         PackagecloudRepository packagecloudRepository = getPackagecloudRepo();
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("key", new File("/", key).toString()));
@@ -227,5 +281,13 @@ public class PackagecloudWagon extends AbstractWagon {
                         packagecloudRepository.getRepoName()
                 ));
         return builder.build().toString();
+    }
+
+    public boolean isDebug() {
+        return isDebug;
+    }
+
+    public void setDebug(boolean debug) {
+        isDebug = debug;
     }
 }
