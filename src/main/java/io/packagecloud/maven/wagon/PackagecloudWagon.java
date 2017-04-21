@@ -172,18 +172,35 @@ public class PackagecloudWagon extends AbstractWagon {
     }
 
 
-    private HttpClientContext getContext() {
+    private HttpClientContext getContext() throws AuthorizationException {
         HttpClientContext context = HttpClientContext.create();
         AuthCache authCache = new BasicAuthCache();
         BasicScheme basicAuth = new BasicScheme();
         authCache.put(getTargetHost(), basicAuth);
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
-        credsProvider.setCredentials(
+        String password = getAuthenticationInfo().getPassword();
+        if (password == null){
+            // can't find what what we need in settings.xml
+            raiseAndtroubleShootPassword();
+        } else {
+            credsProvider.setCredentials(
                 new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, "basic"),
-                new UsernamePasswordCredentials(getAuthenticationInfo().getPassword(), ""));
-        context.setCredentialsProvider(credsProvider);
-        context.setAuthCache(authCache);
+                new UsernamePasswordCredentials(password, ""));
+            context.setCredentialsProvider(credsProvider);
+            context.setAuthCache(authCache);
+        }
         return context;
+    }
+
+    private void raiseAndtroubleShootPassword() throws AuthorizationException {
+        StringBuffer buf = new StringBuffer();
+        buf.append("\n\n\n-----AUTHENTICATION ERROR-----\n");
+        buf.append("Cannot find password for repository id:");
+        buf.append(getRepository().getId());
+        buf.append(" in settings.xml!\n");
+        buf.append("-----AUTHENTICATION ERROR-----\n\n\n");
+
+        throw new AuthorizationException(buf.toString());
     }
 
     private HttpHost getTargetHost() {
