@@ -2,10 +2,7 @@ package io.packagecloud.maven.wagon;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
+import org.apache.http.*;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
@@ -198,7 +195,14 @@ public class PackagecloudWagon extends AbstractWagon {
 
             if (statusLine.getStatusCode() == 422) {
                 String responseText = IOUtils.toString(response.getEntity().getContent());
-                throw new TransferFailedException(String.format("Upload failed: %s", responseText));
+
+                boolean isIdempotentUploadsEnabled = true;
+                boolean hasBeenUploadedBefore = responseText.contains("Path has already been taken");
+                if(isIdempotentUploadsEnabled && hasBeenUploadedBefore){
+                    System.out.println("The artifact has been uploaded already and is not a SNAPSHOT. Will not upload again.");
+                } else {
+                    throw new TransferFailedException(String.format("Upload failed: %s", responseText));
+                }
             }
 
             if (statusLine.getStatusCode() == 500) {
