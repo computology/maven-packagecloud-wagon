@@ -167,7 +167,7 @@ public class PackagecloudWagon extends AbstractWagon {
                     response.close();
                     fireGetCompleted(resource, file);
                     stopwatch.stop();
-                    outputDebug(String.format("[TIMING] get(): %s took %d ms", s));
+                    outputDebug(String.format("[TIMING] get(): %s took %d ms", s, stopwatch.getTime()));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
