@@ -31,26 +31,33 @@ import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.resource.Resource;
+import org.apache.commons.lang.time.StopWatch;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class PackagecloudWagon extends AbstractWagon {
     private final CloseableHttpClient httpClient = getConfiguredHttpClient();
 
     private CloseableHttpClient getConfiguredHttpClient() {
-        return HttpClients
+        StopWatch stopwatch = new StopWatch();
+        stopwatch.start();
+        CloseableHttpClient client = HttpClients
                 .custom()
-                .setUserAgent("io.packagecloud.maven.wagon 0.0.6")
+                .setUserAgent("io.packagecloud.maven.wagon 0.0.7")
                 .build();
+        stopwatch.stop();
+        outputDebug(String.format("[TIMING] getConfiguredHttpClient took %d ms", stopwatch.getTime()));
+        return client;
     }
 
     private boolean isDebug = false;
 
-	public PackagecloudWagon() {
+	  public PackagecloudWagon() {
         super();
     }
 
@@ -116,7 +123,8 @@ public class PackagecloudWagon extends AbstractWagon {
     }
 
     public void get(String s, File file) throws TransferFailedException, ResourceDoesNotExistException, AuthorizationException {
-        outputDebug(String.format("get(): %s", s));
+	      StopWatch stopwatch = new StopWatch();
+	      stopwatch.start();
         Resource resource = new Resource(s);
         fireGetInitiated(resource, file);
         CloseableHttpResponse response = null;
@@ -157,11 +165,13 @@ public class PackagecloudWagon extends AbstractWagon {
             try {
                 if(response != null){
                     response.close();
+                    fireGetCompleted(resource, file);
+                    stopwatch.stop();
+                    outputDebug(String.format("[TIMING] get(): %s took %d ms", s));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            fireGetCompleted(resource, file);
         }
 
     }
@@ -171,7 +181,8 @@ public class PackagecloudWagon extends AbstractWagon {
     }
 
     public void put(File file, String s) throws TransferFailedException, ResourceDoesNotExistException, AuthorizationException {
-        outputDebug(String.format("put: %s", s));
+	      StopWatch stopwatch = new StopWatch();
+	      stopwatch.start();
         Resource resource = new Resource(s);
         resource.setContentLength(file.length());
         resource.setLastModified(file.lastModified());
@@ -217,6 +228,8 @@ public class PackagecloudWagon extends AbstractWagon {
                     response.close();
                 }
                 firePutCompleted(resource, file);
+                stopwatch.stop();
+                outputDebug(String.format("[TIMING] put: %s took %d ms", s, stopwatch.getTime()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -225,13 +238,14 @@ public class PackagecloudWagon extends AbstractWagon {
 
 
     private HttpClientContext getContext() throws AuthorizationException {
+        StopWatch stopwatch = new StopWatch();
+        stopwatch.start();
         HttpClientContext context = HttpClientContext.create();
         AuthCache authCache = new BasicAuthCache();
         BasicScheme basicAuth = new BasicScheme();
         authCache.put(getTargetHost(), basicAuth);
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
         String password = getAuthenticationInfo().getPassword();
-        outputDebug("getContext(): looking up password");
         if (password == null){
             // can't find what what we need in settings.xml
             raiseAndtroubleShootPassword();
@@ -242,6 +256,8 @@ public class PackagecloudWagon extends AbstractWagon {
             context.setCredentialsProvider(credsProvider);
             context.setAuthCache(authCache);
         }
+        stopwatch.stop();
+        outputDebug(String.format("[TIMING] getContext() took %d ms", stopwatch.getTime()));
         return context;
     }
 
@@ -270,7 +286,8 @@ public class PackagecloudWagon extends AbstractWagon {
     }
 
     private String constructArtifactRequest(String key) throws URISyntaxException {
-        outputDebug(String.format("constructArtifactRequest(): %s", key));
+        StopWatch stopwatch = new StopWatch();
+        stopwatch.start();
         PackagecloudRepository packagecloudRepository = getPackagecloudRepo();
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("key", new File("/", key).toString()));
@@ -280,7 +297,10 @@ public class PackagecloudWagon extends AbstractWagon {
                         packagecloudRepository.getUserName(),
                         packagecloudRepository.getRepoName()
                 ));
-        return builder.build().toString();
+        String str = builder.build().toString();
+        outputDebug(String.format("[TIMING] constructArtifactRequest(): %s, took %d ms", key, stopwatch.getTime()));
+        stopwatch.stop();
+        return str;
     }
 
     public boolean isDebug() {
