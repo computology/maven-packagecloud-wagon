@@ -44,11 +44,11 @@ public class PackagecloudWagon extends AbstractWagon {
     private CloseableHttpClient getConfiguredHttpClient() {
         return HttpClients
                 .custom()
-                .setUserAgent("io.packagecloud.maven.wagon 0.0.6")
+                .setUserAgent("io.packagecloud.maven.wagon 0.0.7")
                 .build();
     }
 
-    private boolean isDebug = false;
+    private boolean isDebug = true;
 
 	public PackagecloudWagon() {
         super();
@@ -182,8 +182,8 @@ public class PackagecloudWagon extends AbstractWagon {
             firePutStarted(resource, file);
 
             HttpPut httpPut = new HttpPut(constructArtifactRequest(s));
-            FileEntity fileEntity = new FileEntity(file);
-            httpPut.setEntity(new BufferedHttpEntity(fileEntity));
+            BufferedFileEntity fileEntity = new BufferedFileEntity(file);
+            httpPut.setEntity(fileEntity);
 
             response = httpClient.execute(getTargetHost(), httpPut, getContext());
             StatusLine statusLine = response.getStatusLine();
