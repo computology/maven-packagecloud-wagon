@@ -55,7 +55,7 @@ public class PackagecloudWagon extends AbstractWagon {
         return client;
     }
 
-    private boolean isDebug = false;
+    private boolean isDebug = true;
 
 	  public PackagecloudWagon() {
         super();
@@ -193,8 +193,8 @@ public class PackagecloudWagon extends AbstractWagon {
             firePutStarted(resource, file);
 
             HttpPut httpPut = new HttpPut(constructArtifactRequest(s));
-            FileEntity fileEntity = new FileEntity(file);
-            httpPut.setEntity(new BufferedHttpEntity(fileEntity));
+            BufferedFileEntity fileEntity = new BufferedFileEntity(file);
+            httpPut.setEntity(fileEntity);
 
             response = httpClient.execute(getTargetHost(), httpPut, getContext());
             StatusLine statusLine = response.getStatusLine();
