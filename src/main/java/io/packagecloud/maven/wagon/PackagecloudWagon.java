@@ -216,6 +216,10 @@ public class PackagecloudWagon extends AbstractWagon {
                 throw new TransferFailedException("There was an unexpected server error! (500)");
             }
 
+            if (statusLine.getStatusCode() == 502) {
+                throw new TransferFailedException("There was an unexpected gateway error! (502)");
+            }
+
             postProcessListeners(resource, file, TransferEvent.REQUEST_PUT);
 
         } catch (IOException e) {
