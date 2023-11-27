@@ -48,7 +48,7 @@ public class PackagecloudWagon extends AbstractWagon {
         stopwatch.start();
         CloseableHttpClient client = HttpClients
                 .custom()
-                .setUserAgent("io.packagecloud.maven.wagon 0.0.7")
+                .setUserAgent("io.packagecloud.maven.wagon 0.0.8")
                 .build();
         stopwatch.stop();
         outputDebug(String.format("[TIMING] getConfiguredHttpClient took %d ms", stopwatch.getTime()));

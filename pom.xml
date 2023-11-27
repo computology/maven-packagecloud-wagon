@@ -3,7 +3,7 @@
 
   <groupId>io.packagecloud.maven.wagon</groupId>
   <artifactId>maven-packagecloud-wagon</artifactId>
-  <version>0.0.7</version>
+  <version>0.0.8</version>
   <packaging>jar</packaging>
 
   <name>${project.groupId}:${project.artifactId}</name>
@@ -70,6 +70,16 @@
     </profile>
   </profiles>
 
+  <pluginRepositories>
+    <pluginRepository>
+      <id>computology-maven-packagecloud-wagon</id>
+      <url>https://packagecloud.io/computology/maven-packagecloud-wagon/maven2</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </pluginRepository>
+  </pluginRepositories>
+
   <build>
     <extensions>
       <extension>
@@ -132,11 +142,11 @@
 
   <distributionManagement>
     <repository>
-      <id>packagecloud-capotej</id>
+      <id>packagecloud-Computology</id>
       <url>packagecloud+https://packagecloud.io/computology/maven-packagecloud-wagon</url>
     </repository>
     <snapshotRepository>
-      <id>packagecloud-capotej</id>
+      <id>packagecloud-Computology</id>
       <url>packagecloud+https://packagecloud.io/computology/maven-packagecloud-wagon</url>
     </snapshotRepository>
   </distributionManagement>
